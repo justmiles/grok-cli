@@ -24,7 +24,7 @@ Flags:
 
 ```sh-session
 grok parse \
-  -d ~/augeo/grok-patterns \
+  -d ~/grok-patterns \
   --multi-line-pattern '%{TS:timestamp}' \
   --pattern '%{TS:timestamp} %{LOGLEVEL:level}%{SPACE}\[%{THREAD:thread}\] %{JAVACLASS:class}:%{SPACE}%{RAW:details}' \
   --output-type json \
