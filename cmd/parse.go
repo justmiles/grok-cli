@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"log"
+	"regexp"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -34,7 +36,7 @@ func init() {
 	parseCmd.PersistentFlags().StringVarP(&outputType, "output-type", "o", "json", "output type csv or json")
 
 	// TODO: add support for "--additional-pattern"
-	//    parseCmd.PersistentFlags().StringArrayVarP(&additionalPatterns, "additional-pattern", "a", nil, "additional grok pattern to reference")
+	parseCmd.PersistentFlags().StringArrayVarP(&additionalPatterns, "additional-pattern", "a", nil, "additional grok pattern to reference")
 
 	rootCmd.AddCommand(parseCmd)
 
@@ -50,6 +52,13 @@ var parseCmd = &cobra.Command{
 func doWork(cmd *cobra.Command, args []string) {
 	g, err := grok.NewWithConfig(&config)
 	check(err)
+
+	for _, pattern := range additionalPatterns {
+		words := strings.Fields(pattern)
+		reg := regexp.MustCompile(`^\S* `)
+		res := reg.ReplaceAllString(pattern, "")
+		g.AddPattern(words[0], res)
+	}
 
 	for _, arg := range args {
 
