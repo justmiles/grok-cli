@@ -6,6 +6,12 @@ Easily test your grok expressions and parse log files from the CLI
 
 Download install the grok binary from the [releases](https://github.com/justmiles/grok-cli/releases) page.
 
+```
+# Linux install
+curl -sfLo ~/bin/grok https://github.com/justmiles/grok-cli/releases/download/v0.0.2/grok-0.0.2-linux
+chmod +x ~/bin/grok
+```
+
 ## Usage
 
     Usage:
