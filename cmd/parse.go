@@ -34,8 +34,6 @@ func init() {
 	parseCmd.PersistentFlags().StringVarP(&pattern, "pattern", "p", "", "pattern to match")
 	parseCmd.PersistentFlags().StringVarP(&multiLinePattern, "multi-line-pattern", "m", "", "pattern to mark the beginning of a multiline grok")
 	parseCmd.PersistentFlags().StringVarP(&outputType, "output-type", "o", "json", "output type csv or json")
-
-	// TODO: add support for "--additional-pattern"
 	parseCmd.PersistentFlags().StringArrayVarP(&additionalPatterns, "additional-pattern", "a", nil, "additional grok pattern to reference")
 
 	rootCmd.AddCommand(parseCmd)
@@ -50,6 +48,12 @@ var parseCmd = &cobra.Command{
 }
 
 func doWork(cmd *cobra.Command, args []string) {
+
+	// Always include empty values for CSV output
+	if outputType == "csv" {
+		config.RemoveEmptyValues = false
+	}
+
 	g, err := grok.NewWithConfig(&config)
 	check(err)
 
@@ -109,15 +113,27 @@ func outputJSON(values map[string]string) {
 	fmt.Println(string(jsonString))
 }
 
-func outputCSV(values map[string]string) {
-	writer := csv.NewWriter(os.Stdout)
-	var record []string
+var csvHeaders []string
 
-	record = append(record, values["timestamp"])
-	record = append(record, values["level"])
-	record = append(record, values["thread"])
-	record = append(record, values["class"])
-	record = append(record, values["details"])
+func outputCSV(values map[string]string) {
+	if len(values) == 0 {
+		return
+	}
+	writer := csv.NewWriter(os.Stdout)
+
+	if len(csvHeaders) == 0 {
+		for header := range values {
+			csvHeaders = append(csvHeaders, header)
+		}
+		writer.Write(csvHeaders)
+		writer.Flush()
+	}
+
+	// write records
+	var record []string
+	for _, header := range csvHeaders {
+		record = append(record, values[header])
+	}
 	writer.Write(record)
 	writer.Flush()
 }
