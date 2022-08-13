@@ -29,7 +29,6 @@ chmod +x ~/bin/grok
 
 ## Examples
 
-    sh-session
     grok parse \
       -d ~/grok-patterns \
       --multi-line-pattern '%{TS:timestamp}' \
