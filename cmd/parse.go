@@ -86,6 +86,7 @@ func doWork(cmd *cobra.Command, args []string) {
 					continue
 				}
 			} else {
+				str = scanner.Text()
 				values, err = g.Parse(pattern, str)
 			}
 
